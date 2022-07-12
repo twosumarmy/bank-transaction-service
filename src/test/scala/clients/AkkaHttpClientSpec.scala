@@ -13,15 +13,15 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.syntax._
 import io.circe.generic.auto._
 
+class AkkaHttpClientSpec
+    extends TestKit(ActorSystem("AkkaHttpClientSpec"))
+    with AsyncWordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with FailFastCirceSupport {
 
-class AkkaHttpClientSpec extends TestKit(ActorSystem("AkkaHttpClientSpec"))
-  with AsyncWordSpecLike
-  with Matchers
-  with BeforeAndAfterAll
-  with FailFastCirceSupport {
-
-  val client = new AkkaHttpClient()(system)
-  val wireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
+  val client          = new AkkaHttpClient()(system)
+  val wireMockServer  = new WireMockServer(wireMockConfig().dynamicPort())
   val applicationJson = "application/json"
   case class DummyObject(someId: Int, someString: String)
 
@@ -36,12 +36,12 @@ class AkkaHttpClientSpec extends TestKit(ActorSystem("AkkaHttpClientSpec"))
     TestKit.shutdownActorSystem(system)
   }
 
-  "AkkaHttpClientTest" when {
+  "AkkaHttpClientSpec" when {
     "get" should {
       "return response with status" in {
         val mockResponse = aResponse().withStatus(OK.intValue)
         wireMockServer.stubFor(get(urlEqualTo("/get?id=1")).willReturn(mockResponse))
-        val get_url = s"${wireMockServer.baseUrl()}/get"
+        val get_url      = s"${wireMockServer.baseUrl()}/get"
 
         val responseFuture = client.get[DummyObject](get_url, params = Map("id" -> "1"))
         responseFuture.flatMap { response =>
@@ -51,12 +51,12 @@ class AkkaHttpClientSpec extends TestKit(ActorSystem("AkkaHttpClientSpec"))
 
       "return response with body" in {
         val dummyObject: DummyObject = DummyObject(12345, "something as object content")
-        val response = aResponse()
+        val response                 = aResponse()
           .withStatus(OK.intValue)
           .withHeader("Content-Type", applicationJson)
           .withBody(dummyObject.asJson.noSpaces)
         wireMockServer.stubFor(get(urlEqualTo("/get")).willReturn(response))
-        val get_url = s"${wireMockServer.baseUrl()}/get"
+        val get_url                  = s"${wireMockServer.baseUrl()}/get"
 
         val responseFuture = client.get[DummyObject](get_url)
         responseFuture.flatMap { response =>
@@ -70,7 +70,7 @@ class AkkaHttpClientSpec extends TestKit(ActorSystem("AkkaHttpClientSpec"))
           .withHeader("Content-Type", applicationJson)
           .withHeader("TestKey", "TestValue")
         wireMockServer.stubFor(get(urlEqualTo("/get?id=1")).willReturn(response))
-        val get_url = s"${wireMockServer.baseUrl()}/get"
+        val get_url  = s"${wireMockServer.baseUrl()}/get"
 
         client
           .get[DummyObject](get_url, params = Map("id" -> "1"))
