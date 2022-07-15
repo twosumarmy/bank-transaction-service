@@ -1,0 +1,15 @@
+{
+  "totalItems":1,
+  "offset":0,
+  "limit":10,
+  "accounts":[
+    {
+      "iban":"DE00500700100200000027",
+      "currencyCode":"EUR",
+      "bic":"DEUTDEFFXXX",
+      "accountType":"CURRENT_ACCOUNT",
+      "currentBalance":100.95,
+      "productDescription":"Persönliches Konto"
+    }
+  ]
+}
