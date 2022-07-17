@@ -209,12 +209,13 @@ object DeutscheBankAccount {
  * @param accessToken
  *   Specifies the access token for authorization.
  */
-class DeutscheBankAccount(var accessToken: String)(implicit actorSystem: ActorSystem)
-    extends AkkaHttpClient
+class DeutscheBankAccount(var accessToken: String, val baseUrl: String = DeutscheBankAccount.Domain.Simulation)(implicit
+  actorSystem: ActorSystem
+) extends AkkaHttpClient
     with FailFastCirceSupport {
 
   import DeutscheBankAccount.Api._
-  import DeutscheBankAccount.Domain.Simulation
+  import DeutscheBankAccount.Domain._
   import DeutscheBankAccount.Response._
   import DeutscheBankAccount.Codecs._
 
@@ -222,17 +223,17 @@ class DeutscheBankAccount(var accessToken: String)(implicit actorSystem: ActorSy
     accessToken = token
 
   /**
-   * Reads all accounts of the current user. f given IBAN is not valid or does not represent an account of the current
+   * Reads all accounts of the current user. If given IBAN is not valid or does not represent an account of the current
    * user, an empty result is returned.
    * @param iban
    *   representing an account of the current user
    * @return
    *   [[Future[Response[GetBankAccountsResponse]]]
    */
-  def getBankAccount(iban: String)(implicit ec: ExecutionContext): Future[Response[GetBankAccountsResponse]] =
+  def getBankAccounts(iban: String = "")(implicit ec: ExecutionContext): Future[Response[GetBankAccountsResponse]] =
     get[GetBankAccountsResponse](
       getUriWith(bankingCashAccounts),
-      params = Map("iban" -> iban),
+      params = if (iban == "") Map() else Map("iban" -> iban),
       headers = getHeaders
     )
 
@@ -254,5 +255,5 @@ class DeutscheBankAccount(var accessToken: String)(implicit actorSystem: ActorSy
 
   private def getHeaders: Map[String, String] = Map("Authorization" -> s"Bearer $accessToken")
 
-  private def getUriWith(path: String): String = Uri(Simulation).withPath(Path(path)).toString()
+  private def getUriWith(path: String): String = Uri(baseUrl).withPath(Path(path)).toString()
 }

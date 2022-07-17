@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.syntax._
 import io.circe.generic.auto._
+import tags.ApiCall
 
 class AkkaHttpClientSpec
     extends TestKit(ActorSystem("AkkaHttpClientSpec"))
@@ -38,7 +39,7 @@ class AkkaHttpClientSpec
 
   "AkkaHttpClientSpec" when {
     "get" should {
-      "return response with status" in {
+      "return response with status" taggedAs ApiCall in {
         val mockResponse = aResponse().withStatus(OK.intValue)
         wireMockServer.stubFor(get(urlEqualTo("/get?id=1")).willReturn(mockResponse))
         val get_url      = s"${wireMockServer.baseUrl()}/get"
@@ -49,7 +50,7 @@ class AkkaHttpClientSpec
         }
       }
 
-      "return response with body" in {
+      "return response with body" taggedAs ApiCall in {
         val dummyObject: DummyObject = DummyObject(12345, "something as object content")
         val response                 = aResponse()
           .withStatus(OK.intValue)
@@ -59,12 +60,12 @@ class AkkaHttpClientSpec
         val get_url                  = s"${wireMockServer.baseUrl()}/get"
 
         val responseFuture = client.get[DummyObject](get_url)
-        responseFuture.flatMap { response =>
+        responseFuture.map { response =>
           response.body shouldBe SuccessResponseBody(dummyObject)
         }
       }
 
-      "return response with headers" in {
+      "return response with headers" taggedAs ApiCall in {
         val response = aResponse()
           .withStatus(OK.intValue)
           .withHeader("Content-Type", applicationJson)
@@ -74,7 +75,7 @@ class AkkaHttpClientSpec
 
         client
           .get[DummyObject](get_url, params = Map("id" -> "1"))
-          .flatMap(_.headers.getOrElse("TestKey", List("failed")) shouldBe List("TestValue"))
+          .map(_.headers.getOrElse("TestKey", List("failed")) shouldBe List("TestValue"))
       }
     }
   }
