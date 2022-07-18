@@ -1,0 +1,8 @@
+{
+  "iban":"DE00500700100200000027",
+  "currencyCode":"EUR",
+  "bic":"DEUTDEFFXXX",
+  "accountType":"CURRENT_ACCOUNT",
+  "currentBalance":100.95,
+  "productDescription":"Persönliches Konto"
+}
