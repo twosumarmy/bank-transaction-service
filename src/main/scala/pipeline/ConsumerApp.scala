@@ -1,6 +1,7 @@
 package pipeline
 
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Sink
 import akka.stream.{ ActorAttributes, ActorMaterializer, Materializer }
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import scala.util.{ Failure, Success }
@@ -13,7 +14,6 @@ object ConsumerApp extends App with FailFastCirceSupport {
 
   import Flows._
   import Sources.KafkaConsumer._
-  import Sinks._
   import SupervisionPattern.Consumer._
 
   val consume = consumerSource
@@ -26,11 +26,15 @@ object ConsumerApp extends App with FailFastCirceSupport {
         .withAttributes(ActorAttributes.supervisionStrategy(decider))
         .async
     )
-    .runWith(outputSink)
+    .via(
+      requestFlow
+        .withAttributes(ActorAttributes.supervisionStrategy(decider))
+        .async
+    )
+    .runWith(Sink.ignore)
 
   consume.onComplete {
     case Success(_)   => println("Done"); system.terminate()
     case Failure(err) => println(err.toString); system.terminate()
   }
-
 }
