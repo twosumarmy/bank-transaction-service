@@ -10,6 +10,7 @@ object Dependencies {
     val circe                   = "0.14.1"
     val scalaTest               = "3.2.12"
     val wireMock                = "2.27.2"
+    val scalaMockito            = "3.2.12.0"
     val logBack                 = "1.3.0-alpha16"
   }
 
@@ -24,12 +25,13 @@ object Dependencies {
   val circeParser        = "io.circe"              %% "circe-parser"        % Version.circe
   val scalaTest          = "org.scalatest"         %% "scalatest"           % Version.scalaTest
   val wireMock           = "com.github.tomakehurst" % "wiremock"            % Version.wireMock
+  val mockito            = "org.scalatestplus"     %% "mockito-4-5"         % Version.scalaMockito
   val logBack            = "ch.qos.logback"         % "logback-classic"     % Version.logBack
   val akkaSlf4j          = "com.typesafe.akka"     %% "akka-slf4j"          % Version.akka
 
   lazy val akkaDependencies: Seq[ModuleID]     = Seq(akkaStreams, akkaStreamsKafka, akkaHttp, logBack, akkaSlf4j)
   lazy val circeDependencies: Seq[ModuleID]    = Seq(circeCore, circeGeneric, circeParser, akkaHttpCirce)
-  lazy val coreTestDependencies: Seq[ModuleID] = Seq(scalaTest)
+  lazy val coreTestDependencies: Seq[ModuleID] = Seq(scalaTest, mockito)
   lazy val allTestDependencies: Seq[ModuleID]  = coreTestDependencies ++ Seq(
     akkaStreamsTestKit,
     akkaHttpTestKit,
